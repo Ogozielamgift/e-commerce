@@ -1,13 +1,23 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../schema/User");
+const bcrypt = require("bcrypt");
 const getAllUsers = asyncHandler(async (req, res) => {
-  try {
-  } catch (error) {}
+  const getAllUsers = await User.find().sort({ createdAt: -1 });
+  res.status(200).json(getAllUsers);
 });
 
 const signUp = asyncHandler(async (req, res) => {
   const { name, username, email, phone, password } = req.body;
   try {
+    const userExist = await User.findOne({
+      username,
+      email,
+    });
+    if (userExist) {
+      res.status(508).json({
+        message: "User already Exist",
+      });
+    }
     const create = await User.create({
       name,
       username,
@@ -26,16 +36,104 @@ const signUp = asyncHandler(async (req, res) => {
     });
   }
 });
-
-const login = asyncHandler(async(req, res)=>{
-    const {username,password}=req.body;
-    try {
-        
-    } catch (error) {
-        
+const getSingleUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const gozie = await User.findById(id);
+    if (!gozie) {
+      res.status(608).json({
+        message: "Id not found",
+      });
     }
-})
+    res.status(200).json({
+      message: "Successful",
+      gozie,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "Ishi okpushirigi?",
+      error,
+    });
+  }
+});
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params; //where to pass your parameters and request.body
+  // const {isAdmin}=req.body
+  const { phone, password } = req.body;
+  try {
+    const updateData = await User.findById(id);
+    if (!updateData) {
+      res.status(708).json({
+        message: "Content not found",
+      });
+    }
+    updateData.phone = phone || updateData.phone;
+    updateData.password = password || updateData.password;
+    await updateData.save();
+    res.status(200).json({
+      message: "Update successful",
+      updateData,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "unable to update",
+      error,
+    });
+  }
+});
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params; //to pass id as parameter
+  try {
+    const deleteRequest = await User.findByIdAndDelete(id);
+    if (!deleteRequest) {
+      res.status(901).json({
+        message: "content not found",
+      });
+    }
+    res.status(300).json({
+      message: "Delete successful",
+      deleteRequest,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "unable to delete",
+      error,
+    });
+  }
+});
+
+const login = asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const loginUser = await User.findOne({
+      username,
+    });
+    if (!loginUser) {
+      res.status(700).json({
+        message: "No username found",
+      });
+    }
+    const passwordMatch = await bcrypt.compare(password, loginUser.password);
+    if (!passwordMatch) {
+      res.status(800).json({
+        message: "wrong password",
+      });
+    }
+    res.status(200).json({
+      message: "login successful",
+      loginUser,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "unable to login",
+    });
+  }
+});
 module.exports = {
   getAllUsers,
   signUp,
+  login,
+  getSingleUser,
+  updateUser,
+  deleteUser,
 };
