@@ -4,6 +4,14 @@ const bcrypt = require("bcrypt");
 
 const UserSchema = new Schema(
   {
+    isVerified: {
+      type: Boolean,
+      default: true,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
     name: {
       type: String,
       required: true,

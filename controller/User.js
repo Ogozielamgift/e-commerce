@@ -27,7 +27,6 @@ const signUp = asyncHandler(async (req, res) => {
     });
     res.status(200).json({
       message: "signUp successful",
-      create,
     });
   } catch (error) {
     res.status(404).json({
@@ -37,12 +36,12 @@ const signUp = asyncHandler(async (req, res) => {
   }
 });
 const getSingleUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { username } = req.params;
   try {
-    const gozie = await User.findById(id);
+    const gozie = await User.findOne({ username });
     if (!gozie) {
       res.status(608).json({
-        message: "Id not found",
+        message: "User not found",
       });
     }
     res.status(200).json({
@@ -59,16 +58,41 @@ const getSingleUser = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params; //where to pass your parameters and request.body
   // const {isAdmin}=req.body
-  const { phone, password } = req.body;
+  const { name, username, email, phone } = req.body;
   try {
-    const updateData = await User.findById(id);
+    const updateData = await User.findByIdAndUpdate(id);
     if (!updateData) {
       res.status(708).json({
         message: "Content not found",
       });
     }
     updateData.phone = phone || updateData.phone;
-    updateData.password = password || updateData.password;
+    updateData.username = username || updateData.username;
+    updateData.name = name || updateData.name;
+    updateData.email = email || updateData.email;
+    await updateData.save();
+    res.status(200).json({
+      message: "Update successful",
+      updateData,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "unable to update",
+      error,
+    });
+  }
+});
+const resetpassword = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { password } = req.body;
+  try {
+    const updateData = await User.findByIdAndUpdate(id);
+    if (!updateData) {
+      res.status(708).json({
+        message: "Content not found",
+      });
+    }
+   updateData.password = password || updateData.password
     await updateData.save();
     res.status(200).json({
       message: "Update successful",
@@ -92,7 +116,6 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
     res.status(300).json({
       message: "Delete successful",
-      deleteRequest,
     });
   } catch (error) {
     res.status(404).json({
@@ -121,7 +144,6 @@ const login = asyncHandler(async (req, res) => {
     }
     res.status(200).json({
       message: "login successful",
-      loginUser,
     });
   } catch (error) {
     res.status(404).json({
@@ -136,4 +158,5 @@ module.exports = {
   getSingleUser,
   updateUser,
   deleteUser,
+  resetpassword
 };
