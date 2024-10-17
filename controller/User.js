@@ -92,7 +92,7 @@ const resetpassword = asyncHandler(async (req, res) => {
         message: "Content not found",
       });
     }
-   updateData.password = password || updateData.password
+    updateData.password = password || updateData.password;
     await updateData.save();
     res.status(200).json({
       message: "Update successful",
@@ -158,5 +158,5 @@ module.exports = {
   getSingleUser,
   updateUser,
   deleteUser,
-  resetpassword
+  resetpassword,
 };

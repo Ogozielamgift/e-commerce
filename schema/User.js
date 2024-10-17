@@ -54,7 +54,7 @@ const UserSchema = new Schema(
     },
     website: {
       type: String,
-      // default: "https://google.com",
+      default: "https://google.com",
     },
     company: {
       name: {
