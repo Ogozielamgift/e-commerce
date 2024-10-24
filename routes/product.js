@@ -46,8 +46,20 @@ router.put("/:id", async (req, res) => {
         message: "Content not found",
       });
     }
+    const uploadImages = await Promise.all(
+      img.map(async (img) => {
+        const result = await cloudinary.uploader.upload(img, {
+          folder: "products", //optional:store images in a specific folder in Cloudinary
+          fileName: `${req.body.name}.jpg`,
+        });
+        return {
+          url: result.secure_url,
+        };
+      })
+    );
     updateData.quantity = quantity || updateData.quantity;
     updateData.variety = variety || updateData.variety;
+    updateData.img = uploadImages || updateData.img;
     await updateData.save();
     res.status(200).json({
       message: "Update successful",

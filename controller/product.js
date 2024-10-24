@@ -28,7 +28,6 @@ const createNewProduct = asyncHandler(async (req, res) => {
       img.map(async (img) => {
         const result = await cloudinary.uploader.upload(img, {
           folder: "products", //optional:store images in a specific folder in Cloudinary
-          
           fileName: `${req.body.name}.jpg`,
         });
         return {
