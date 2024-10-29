@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../schema/User");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const getAllUsers = asyncHandler(async (req, res) => {
   const getAllUsers = await User.find().sort({ createdAt: -1 });
   res.status(200).json(getAllUsers);
